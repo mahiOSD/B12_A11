@@ -19,22 +19,18 @@ const Navbar = () => {
     <div className='fixed w-full bg-white z-10 shadow-sm'>
       <div className='py-4'>
         <Container>
-          <div className='flex items-center justify-between'>
+          <div className='flex items-center h-16 justify-between'>
 
-            
-            <Link to='/'>
-              <img src={logo} alt='logo' width='200' />
+           <Link to="/">
+            <img src={logo} alt="logo" className="h-24" />
             </Link>
 
-          
             <div className='relative'>
               <div
                 onClick={() => setIsOpen(!isOpen)}
                 className='p-3 border border-neutral-200 flex items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition'
               >
                 <AiOutlineMenu />
-
-              
                 <img
                   className='rounded-full'
                   referrerPolicy='no-referrer'
@@ -45,11 +41,8 @@ const Navbar = () => {
                 />
               </div>
 
-             
               {isOpen && (
                 <div className='absolute rounded-xl shadow-md w-44 bg-white right-0 top-12 text-sm'>
-
-               
                   <Link
                     to='/'
                     onClick={() => setIsOpen(false)}
@@ -102,7 +95,6 @@ const Navbar = () => {
                       </Link>
                     </>
                   )}
-
                 </div>
               )}
             </div>
