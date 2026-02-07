@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from 'react'
 import {
   createUserWithEmailAndPassword,
@@ -40,13 +41,28 @@ const AuthProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, currentUser => {
-      setUser(currentUser)
-      setLoading(false)
-    })
+  const unsubscribe = onAuthStateChanged(auth, async currentUser => {
 
-    return () => unsubscribe()
-  }, [])
+    if (currentUser?.email) {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/users/${currentUser.email}`
+        );
+
+        setUser({ ...currentUser, role: res.data.role });
+      } catch {
+        setUser(currentUser);
+      }
+    } else {
+      setUser(null);
+    }
+
+    setLoading(false);
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   const authInfo = {
     user,

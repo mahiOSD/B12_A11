@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
@@ -25,29 +26,28 @@ const SignUp = () => {
     }
 
     try {
-      
-      await createUser(email, password);
+  const result = await createUser(email, password);
 
-     
-      await updateUserProfile(name, image);
+  await updateUserProfile(name, image);
 
-     
-      const userInfo = {
-        name,
-        email,
-        image,
-        address,
-        role: "user",
-        status: "active",
-      };
+  const userInfo = {
+    name,
+    email,
+    image,
+    address,
+    role: "user",
+    status: "active",
+  };
 
-      console.log(userInfo);
+ 
+  await axios.post("http://localhost:5000/users", userInfo);
 
-      toast.success("Signup Successful");
-      navigate(from, { replace: true });
-    } catch (err) {
-      toast.error(err.message);
-    }
+  toast.success("Signup Successful");
+  navigate(from, { replace: true });
+} catch (err) {
+  toast.error(err.message);
+}
+
   };
 
   return (
