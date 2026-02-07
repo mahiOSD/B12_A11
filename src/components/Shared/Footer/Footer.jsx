@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white py-12 mt-20">
       <Container>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          {/* Contact Details */}
+         
           <div>
             <h3 className="text-xl font-bold mb-4">Contact Us</h3>
             <p>123 Chef Street, Foodie City</p>
@@ -14,7 +14,7 @@ const Footer = () => {
             <p>Phone: +1 234 567 890</p>
           </div>
 
-          {/* Social Media & Hours */}
+         
           <div>
             <h3 className="text-xl font-bold mb-4">Working Hours</h3>
             <p>Mon - Fri: 9:00 AM - 10:00 PM</p>
@@ -26,7 +26,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Copyright */}
+         
           <div>
             <h3 className="text-xl font-bold mb-4">About</h3>
             <p className="text-gray-400">
