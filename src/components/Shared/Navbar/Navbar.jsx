@@ -13,16 +13,16 @@ const Navbar = () => {
 
   const handleDashboardClick = () => {
     if (!user) return navigate('/login');
-   
+
     switch (user.role) {
       case "admin":
         navigate('/dashboard/admin');
         break;
       case "chef":
-        navigate('/dashboard');
+        navigate('/dashboard/create-meal');
         break;
       default:
-        navigate('/dashboard');
+        navigate('/dashboard/user-home');
         break;
     }
   };
@@ -32,7 +32,6 @@ const Navbar = () => {
       <div className='py-4 border-b-[1px]'>
         <Container>
           <div className='flex flex-row items-center justify-between gap-3 md:gap-0'>
-
             <Link to='/' className='flex items-center gap-2'>
               <img src={logo} alt='logo' width='100' height='60' />
               <span className='font-bold text-xl hidden md:block'>LocalChefBazaar</span>
@@ -63,6 +62,7 @@ const Navbar = () => {
                   </div>
                 </div>
               </div>
+
               {isOpen && (
                 <div className='absolute rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden right-0 top-12 text-sm'>
                   <div className='flex flex-col cursor-pointer'>
@@ -84,7 +84,6 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-
           </div>
         </Container>
       </div>
