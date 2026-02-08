@@ -12,7 +12,7 @@ import OrderPage from "../pages/Order/OrderPage";
 
 import Profile from "../pages/Dashboard/Profile/Profile";
 
-
+import DashboardHome from "../pages/Dashboard/DashboardHome";
 import UserDashboard from "../pages/Dashboard/User/UserDashboard";
 import MyOrders from "../pages/Dashboard/User/MyOrders";
 import MyReviews from "../pages/Dashboard/User/MyReviews";
@@ -26,7 +26,8 @@ import OrderRequests from "../pages/Dashboard/Chef/OrderRequests";
 import AdminDashboard from "../pages/Dashboard/Admin/AdminDashboard";
 
 import PrivateRoute from "./PrivateRoute";
-
+import AdminRoute from "../pages/Dashboard/Admin/AdminRoute";
+import ChefRoute from "../pages/Dashboard/Chef/ChefRoute";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -45,7 +46,7 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
     children: [
-    
+    { path: "", element: <DashboardHome /> },
       { path: "", element: <UserDashboard /> },
 
      
@@ -56,13 +57,42 @@ export const router = createBrowserRouter([
       { path: "my-reviews", element: <MyReviews /> },
       { path: "favorites", element: <Favorites /> },
 
-      
-      { path: "create-meal", element: <CreateMeal /> },
-      { path: "my-meals", element: <MyMeals /> },
-      { path: "order-requests", element: <OrderRequests /> },
+       {
+        path: "create-meal",
+        element: (
+          <ChefRoute>
+            <CreateMeal />
+          </ChefRoute>
+        ),
+      },
+
+      {
+        path: "my-meals",
+        element: (
+          <ChefRoute>
+            <MyMeals />
+          </ChefRoute>
+        ),
+      },
+
+      {
+        path: "order-requests",
+        element: (
+          <ChefRoute>
+            <OrderRequests />
+          </ChefRoute>
+        ),
+      },
 
      
-      { path: "admin", element: <AdminDashboard /> },
+    {
+        path: "admin",
+        element: (
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        ),
+      },
     ],
   },
 
