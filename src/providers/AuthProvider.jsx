@@ -40,28 +40,45 @@ const AuthProvider = ({ children }) => {
     })
   }
 
-  useEffect(() => {
+ useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, async currentUser => {
 
     if (currentUser?.email) {
       try {
+       
         const res = await axios.get(
-          `http://localhost:5000/users/${currentUser.email}`
+          `${import.meta.env.VITE_API_URL}/users/${currentUser.email.toLowerCase()}`
+
         );
 
-        setUser({ ...currentUser, role: res.data.role });
-      } catch {
-        setUser(currentUser);
+        const dbUser = res.data;
+        
+
+        setUser({
+          ...currentUser,
+          role: dbUser?.role || "user", 
+        });
+
+      } catch (error) {
+        console.log("Role fetch error:", error);
+
+        setUser({
+          ...currentUser,
+          role: "user",
+        });
       }
+
     } else {
       setUser(null);
     }
 
     setLoading(false);
+
   });
 
   return () => unsubscribe();
 }, []);
+
 
 
   const authInfo = {
@@ -79,5 +96,7 @@ const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+
+
 
 export default AuthProvider

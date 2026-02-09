@@ -19,6 +19,10 @@ import MyMeals from "../pages/Dashboard/Chef/MyMeals";
 import OrderRequests from "../pages/Dashboard/Chef/OrderRequests";
 
 import AdminDashboard from "../pages/Dashboard/Admin/AdminDashboard";
+import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
+import ManageRequests from "../pages/Dashboard/Admin/ManageRequests";
+import Statistics from "../pages/Dashboard/Admin/Statistics";
+
 
 import PrivateRoute from "./PrivateRoute";
 import AdminRoute from "../pages/Dashboard/Admin/AdminRoute";
@@ -45,37 +49,59 @@ export const router = createBrowserRouter([
 
   
   {
-    path: "/dashboard",
-    element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
-    children: [
-      { path: "", element: <DashboardRedirect /> },
-      { path: "user-home", element: <UserDashboard /> },
-      { path: "profile", element: <Profile /> },
-      { path: "my-orders", element: <MyOrders /> },
-      { path: "my-reviews", element: <MyReviews /> },
-      { path: "favorites", element: <Favorites /> },
+  path: "/dashboard",
+  element: (
+    <PrivateRoute>
+      <DashboardLayout />
+    </PrivateRoute>
+  ),
+  children: [
 
-      {
-        path: "create-meal",
-        element: <ChefRoute><CreateMeal /></ChefRoute>,
-      },
-      {
-        path: "my-meals",
-        element: <ChefRoute><MyMeals /></ChefRoute>,
-      },
-      {
-        path: "order-requests",
-        element: <ChefRoute><OrderRequests /></ChefRoute>,
-      },
+    
+    { index: true, element: <DashboardRedirect /> },
 
-      {
-        path: "admin",
-        element: <AdminRoute><AdminDashboard /></AdminRoute>,
-      },
+    
+    { path: "user-home", element: <UserDashboard /> },
+    { path: "profile", element: <Profile /> },
+    { path: "my-orders", element: <MyOrders /> },
+    { path: "my-reviews", element: <MyReviews /> },
+    { path: "favorites", element: <Favorites /> },
 
-      { path: "*", element: <Navigate to="/dashboard" replace /> },
-    ],
-  },
+    
+    {
+      path: "create-meal",
+      element: <ChefRoute><CreateMeal /></ChefRoute>,
+    },
+    {
+      path: "my-meals",
+      element: <ChefRoute><MyMeals /></ChefRoute>,
+    },
+    {
+      path: "order-requests",
+      element: <ChefRoute><OrderRequests /></ChefRoute>,
+    },
+
+    
+    {
+      path: "admin",
+      element: <AdminRoute><AdminDashboard /></AdminRoute>,
+    },
+    {
+      path: "manage-users",
+      element: <AdminRoute><ManageUsers /></AdminRoute>,
+    },
+    {
+      path: "manage-requests",
+      element: <AdminRoute><ManageRequests /></AdminRoute>,
+    },
+    {
+      path: "statistics",
+      element: <AdminRoute><Statistics /></AdminRoute>,
+    },
+
+    { path: "*", element: <Navigate to="/dashboard" replace /> },
+  ],
+},
 
   
   { path: "/login", element: <Login /> },
