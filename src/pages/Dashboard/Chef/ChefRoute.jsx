@@ -6,8 +6,10 @@ const ChefRoute = ({ children }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  if (user?.role !== "chef") {
-    return <Navigate to="/dashboard" />;
+  if (!user) return <Navigate to="/login" replace />;
+
+  if (user.role !== "chef") {
+    return <Navigate to="/dashboard/user-home" replace />;
   }
 
   return children;

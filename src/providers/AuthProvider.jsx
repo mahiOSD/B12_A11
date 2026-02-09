@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -7,79 +7,90 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
-} from 'firebase/auth'
+} from "firebase/auth";
 
-import { app } from '../firebase/firebase.config'
-import { AuthContext } from './AuthContext'
+import { app } from "../firebase/firebase.config";
+import { AuthContext } from "./AuthContext";
 
-const auth = getAuth(app)
+const auth = getAuth(app);
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
 
   const createUser = (email, password) => {
-    setLoading(true)
-    return createUserWithEmailAndPassword(auth, email, password)
-  }
+    setLoading(true);
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
 
+  
   const signIn = (email, password) => {
-    setLoading(true)
-    return signInWithEmailAndPassword(auth, email, password)
-  }
+    setLoading(true);
+    return signInWithEmailAndPassword(auth, email, password);
+  };
 
+  
   const logOut = () => {
-    setLoading(true)
-    return signOut(auth)
-  }
+    setLoading(true);
+    return signOut(auth);
+  };
 
+  
   const updateUserProfile = (name, photo) => {
     return updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photo,
-    })
-  }
+    });
+  };
 
- useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async currentUser => {
+  
+  const fetchUserFromDB = async (firebaseUser) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/users/${firebaseUser.email.toLowerCase()}`
+      );
 
-    if (currentUser?.email) {
-      try {
-       
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/users/${currentUser.email.toLowerCase()}`
+      const dbUser = res.data;
 
-        );
+      setUser({
+        ...firebaseUser,
+        role: dbUser?.role || "user",
+      });
 
-        const dbUser = res.data;
-        
+    } catch (error) {
+      console.log("Role fetch error:", error);
 
-        setUser({
-          ...currentUser,
-          role: dbUser?.role || "user", 
-        });
+      setUser({
+        ...firebaseUser,
+        role: "user",
+      });
+    }
+  };
 
-      } catch (error) {
-        console.log("Role fetch error:", error);
+  
+  const refreshUser = async () => {
+    const currentUser = auth.currentUser;
 
-        setUser({
-          ...currentUser,
-          role: "user",
-        });
+    if (!currentUser?.email) return;
+
+    await fetchUserFromDB(currentUser);
+  };
+
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser?.email) {
+        await fetchUserFromDB(currentUser);
+      } else {
+        setUser(null);
       }
 
-    } else {
-      setUser(null);
-    }
+      setLoading(false);
+    });
 
-    setLoading(false);
-
-  });
-
-  return () => unsubscribe();
-}, []);
-
-
+    return () => unsubscribe();
+  }, []);
 
   const authInfo = {
     user,
@@ -88,15 +99,14 @@ const AuthProvider = ({ children }) => {
     signIn,
     logOut,
     updateUserProfile,
-  }
+    refreshUser, 
+  };
 
   return (
     <AuthContext.Provider value={authInfo}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-
-
-export default AuthProvider
+export default AuthProvider;
