@@ -8,6 +8,7 @@ import MealDetails from "../pages/Meals/MealDetails";
 import OrderPage from "../pages/Order/OrderPage";
 import Profile from "../pages/Dashboard/Profile/Profile";
 
+import UserRoute from "../pages/Dashboard/User/UserRoute";
 import DashboardRedirect from "../pages/Dashboard/DashboardRedirect";
 import UserDashboard from "../pages/Dashboard/User/UserDashboard";
 import MyOrders from "../pages/Dashboard/User/MyOrders";
@@ -61,11 +62,22 @@ export const router = createBrowserRouter([
     { index: true, element: <DashboardRedirect /> },
 
     
-    { path: "user-home", element: <UserDashboard /> },
-    { path: "profile", element: <Profile /> },
-    { path: "my-orders", element: <MyOrders /> },
-    { path: "my-reviews", element: <MyReviews /> },
-    { path: "favorites", element: <Favorites /> },
+    {
+  path: "user-home",
+  element: <UserRoute><UserDashboard /></UserRoute>,
+},
+{
+  path: "my-orders",
+  element: <UserRoute><MyOrders /></UserRoute>,
+},
+{
+  path: "my-reviews",
+  element: <UserRoute><MyReviews /></UserRoute>,
+},
+{
+  path: "favorites",
+  element: <UserRoute><Favorites /></UserRoute>,
+},
 
     
     {

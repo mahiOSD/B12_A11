@@ -6,9 +6,8 @@ const UserDashboard = () => {
       <h1 className="text-3xl font-bold mb-6">User Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link to="/dashboard/profile" className="p-6 bg-white shadow rounded hover:shadow-lg transition text-center">
-          My Profile
-        </Link>
+       <Link to="/profile" className="...">My Profile</Link>
+
         <Link to="/dashboard/my-orders" className="p-6 bg-white shadow rounded hover:shadow-lg transition text-center">
           My Orders
         </Link>

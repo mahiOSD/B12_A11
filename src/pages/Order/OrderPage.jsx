@@ -32,17 +32,22 @@ const OrderPage = () => {
 
     if (confirm.isConfirmed) {
       const orderData = {
-        foodId: meal._id,
-        mealName: meal.name,
-        price: meal.price,
-        quantity: parseInt(quantity),
-        chefId: meal.chefId,
-        paymentStatus: "Pending",
-        userEmail: user.email,
-        userAddress: address,
-        orderStatus: "pending",
-        orderTime: new Date().toISOString()
-      };
+  foodId: meal._id,
+  mealName: meal.name,
+  price: meal.price,
+  quantity: parseInt(quantity),
+
+  chefId: meal.chefId,
+  chefName: meal.chefName,
+  chefEmail: meal.chefEmail,
+
+  paymentStatus: "Pending",
+  userEmail: user.email,
+  userAddress: address,
+  orderStatus: "pending",
+  orderTime: new Date().toISOString()
+};
+
 
       const res = await axiosSecure.post("/orders", orderData);
       if (res.data.insertedId) {

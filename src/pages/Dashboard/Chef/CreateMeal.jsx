@@ -1,32 +1,49 @@
 import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const CreateMeal = () => {
   const { user } = useAuth();
   const [meal, setMeal] = useState({
-    name: "",
-    image: "",
+    foodName: "",
     price: "",
-    deliveryArea: "",
     rating: "",
+    ingredients: [],
+    estimatedDeliveryTime: "",
+    chefExperience: "",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [ingredientInput, setIngredientInput] = useState("");
 
   const handleChange = e => setMeal({...meal, [e.target.name]: e.target.value });
 
+  const handleAddIngredient = () => {
+    if (ingredientInput.trim()) {
+      setMeal({...meal, ingredients: [...meal.ingredients, ingredientInput.trim()]});
+      setIngredientInput("");
+    }
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
-    const mealData = {
-      ...meal,
-      chefName: user.displayName,
-      chefId: user._id,
-    };
+    if (!imageFile) return Swal.fire("Error", "Please upload an image", "error");
+
+    const formData = new FormData();
+    formData.append("foodImage", imageFile);
+    Object.entries({...meal, chefName: user.displayName, chefId: user._id, userEmail: user.email}).forEach(([key, value]) => {
+      if (Array.isArray(value)) value.forEach(v => formData.append(key, v));
+      else formData.append(key, value);
+    });
+
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/meals`, mealData);
-      if (res.data.insertedId) alert("Meal created successfully");
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/meals`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      if (res.data.insertedId) Swal.fire("Success", "Meal created successfully", "success");
     } catch (err) {
       console.error(err);
-      alert("Failed to create meal");
+      Swal.fire("Error", "Failed to create meal", "error");
     }
   };
 
@@ -34,11 +51,21 @@ const CreateMeal = () => {
     <div className="pt-24 max-w-xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Create Meal</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="name" placeholder="Meal Name" onChange={handleChange} className="w-full p-2 border rounded"/>
-        <input name="image" placeholder="Image URL" onChange={handleChange} className="w-full p-2 border rounded"/>
+        <input name="foodName" placeholder="Food Name" onChange={handleChange} className="w-full p-2 border rounded"/>
+        <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} className="w-full p-2 border rounded"/>
         <input name="price" type="number" placeholder="Price" onChange={handleChange} className="w-full p-2 border rounded"/>
-        <input name="deliveryArea" placeholder="Delivery Area" onChange={handleChange} className="w-full p-2 border rounded"/>
-        <input name="rating" placeholder="Rating" onChange={handleChange} className="w-full p-2 border rounded"/>
+        <input name="rating" type="number" placeholder="Rating" step="0.1" onChange={handleChange} className="w-full p-2 border rounded"/>
+        
+        <div className="flex gap-2">
+          <input value={ingredientInput} onChange={e => setIngredientInput(e.target.value)} placeholder="Add Ingredient" className="w-full p-2 border rounded"/>
+          <button type="button" onClick={handleAddIngredient} className="bg-teal-600 text-white px-4 rounded">Add</button>
+        </div>
+        <p>Ingredients: {meal.ingredients.join(", ")}</p>
+
+        <input name="estimatedDeliveryTime" placeholder="Estimated Delivery Time" onChange={handleChange} className="w-full p-2 border rounded"/>
+        <input name="chefExperience" placeholder="Chef Experience" onChange={handleChange} className="w-full p-2 border rounded"/>
+        <input value={user.email} readOnly className="w-full p-2 border rounded bg-gray-100"/>
+        
         <button className="w-full bg-teal-600 text-white py-2 rounded">Create</button>
       </form>
     </div>
