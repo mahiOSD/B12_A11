@@ -14,6 +14,9 @@ import UserDashboard from "../pages/Dashboard/User/UserDashboard";
 import MyOrders from "../pages/Dashboard/User/MyOrders";
 import MyReviews from "../pages/Dashboard/User/MyReviews";
 import Favorites from "../pages/Dashboard/User/Favorites";
+import Payment from "../pages/Dashboard/User/Payment";
+import PaymentSuccess from "../pages/Dashboard/User/PaymentSuccess";
+
 
 import CreateMeal from "../pages/Dashboard/Chef/CreateMeal";
 import MyMeals from "../pages/Dashboard/Chef/MyMeals";
@@ -71,8 +74,24 @@ export const router = createBrowserRouter([
   path: "profile",
   element: <PrivateRoute><Profile /></PrivateRoute>,
 },
+{
+        path: "payment/:id",
+        element: (
+          <UserRoute>
+            <Payment />
+          </UserRoute>
+        ),
+      },
+      {
+  path: "payment-success",
+  element: (
+    <UserRoute>
+      <PaymentSuccess />
+    </UserRoute>
+  ),
+},
 
-    {
+ {
   path: "user-home",
   element: <UserRoute><UserDashboard /></UserRoute>,
 },
