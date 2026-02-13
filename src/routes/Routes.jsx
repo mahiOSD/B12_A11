@@ -18,6 +18,7 @@ import Favorites from "../pages/Dashboard/User/Favorites";
 import CreateMeal from "../pages/Dashboard/Chef/CreateMeal";
 import MyMeals from "../pages/Dashboard/Chef/MyMeals";
 import OrderRequests from "../pages/Dashboard/Chef/OrderRequests";
+import UpdateMeal from "../pages/Dashboard/Chef/UpdateMeal";
 
 import AdminDashboard from "../pages/Dashboard/Admin/AdminDashboard";
 import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
@@ -92,9 +93,12 @@ export const router = createBrowserRouter([
       path: "order-requests",
       element: <ChefRoute><OrderRequests /></ChefRoute>,
     },
+   {
+  path: "update-meal/:id",
+  element: <ChefRoute><UpdateMeal /></ChefRoute>,
+},
 
-    
-    {
+ {
       path: "admin",
       element: <AdminRoute><AdminDashboard /></AdminRoute>,
     },
