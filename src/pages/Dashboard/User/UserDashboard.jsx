@@ -1,22 +1,16 @@
 import { Link } from "react-router-dom";
-
 const UserDashboard = () => {
   return (
-    <div className="pt-24 max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">User Dashboard</h1>
+    <div className="pt-24 flex justify-center items-center min-h-[70vh]">
+      <div className="text-center max-w-xl">
+        <h1 className="text-4xl font-bold mb-4">
+          Welcome to Your Dashboard 
+        </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-       <Link to="/profile" className="...">My Profile</Link>
-
-        <Link to="/dashboard/my-orders" className="p-6 bg-white shadow rounded hover:shadow-lg transition text-center">
-          My Orders
-        </Link>
-        <Link to="/dashboard/my-reviews" className="p-6 bg-white shadow rounded hover:shadow-lg transition text-center">
-          My Reviews
-        </Link>
-        <Link to="/dashboard/favorites" className="p-6 bg-white shadow rounded hover:shadow-lg transition text-center">
-          Favorite Meals
-        </Link>
+        <p className="text-gray-600 text-lg">
+          From here you can manage your orders, reviews, and favorite meals.
+          Use the menu on the left side to navigate through different options.
+        </p>
       </div>
     </div>
   );

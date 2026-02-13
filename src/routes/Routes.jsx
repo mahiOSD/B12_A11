@@ -49,7 +49,8 @@ export const router = createBrowserRouter([
   element: <UserRoute><OrderPage /></UserRoute>
 },
 
-      { path: "/profile", element: <PrivateRoute><Profile /></PrivateRoute> },
+  
+
     ],
   },
 
@@ -66,7 +67,11 @@ export const router = createBrowserRouter([
     
     { index: true, element: <DashboardRedirect /> },
 
-    
+    {
+  path: "profile",
+  element: <PrivateRoute><Profile /></PrivateRoute>,
+},
+
     {
   path: "user-home",
   element: <UserRoute><UserDashboard /></UserRoute>,
