@@ -1,40 +1,65 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
+import { LoadingContext } from "../../../contexts/LoadingContext";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+import Swal from "sweetalert2";
 
 const MyReviews = () => {
   const { user } = useAuth();
+  const { loading, setLoading } = useContext(LoadingContext);
   const [reviews, setReviews] = useState([]);
 
-  const fetchReviews = () => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/reviews`)
-      .then(res => {
-        const myReviews = res.data.filter(r => r.userEmail === user.email);
-        setReviews(myReviews);
-      })
-      .catch(err => console.error(err));
+  const fetchReviews = async () => {
+    if (!user?.email) return;
+    setLoading(true);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/reviews`);
+      const myReviews = res.data.filter(r => r.userEmail === user.email);
+      setReviews(myReviews);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to fetch reviews", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    if (user?.email) fetchReviews();
+    fetchReviews();
   }, [user?.email]);
 
   const handleDelete = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this review?");
-    if (!confirm) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This review will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/reviews/${id}`);
-      alert("Review deleted successfully");
+      Swal.fire("Deleted!", "Your review has been deleted.", "success");
       fetchReviews();
     } catch (err) {
       console.error(err);
+      Swal.fire("Error", "Failed to delete review", "error");
     }
   };
 
   const handleUpdate = async (review) => {
-    const newComment = prompt("Update your review:", review.comment);
+    const { value: newComment } = await Swal.fire({
+      title: "Update Review",
+      input: "textarea",
+      inputLabel: "Edit your comment",
+      inputValue: review.comment,
+      showCancelButton: true,
+    });
+
     if (!newComment) return;
 
     try {
@@ -42,17 +67,23 @@ const MyReviews = () => {
         rating: review.rating,
         comment: newComment,
       });
-      alert("Review updated successfully");
+      Swal.fire("Updated!", "Your review has been updated.", "success");
       fetchReviews();
     } catch (err) {
       console.error(err);
+      Swal.fire("Error", "Failed to update review", "error");
     }
   };
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="pt-24 max-w-5xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">My Reviews</h1>
-      {reviews.length === 0 && <p>No reviews yet</p>}
+
+      {reviews.length === 0 && (
+        <p className="text-center text-gray-500">No reviews yet</p>
+      )}
 
       <div className="grid grid-cols-1 gap-4">
         {reviews.map(r => (

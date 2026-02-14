@@ -52,7 +52,6 @@ export const router = createBrowserRouter([
   element: <UserRoute><OrderPage /></UserRoute>
 },
 
-  
 
     ],
   },

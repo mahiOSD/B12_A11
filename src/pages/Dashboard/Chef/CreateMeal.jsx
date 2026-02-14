@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext } from "react";
 import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { LoadingContext } from "../../../contexts/LoadingContext";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
+const { loading, setLoading } = useContext(LoadingContext);
+
 
 const CreateMeal = () => {
   const { user, setUser } = useAuth();
@@ -21,21 +25,22 @@ const CreateMeal = () => {
 
   useEffect(() => {
   if (user?.email) {
+    setLoading(true);
     axios
       .get(`${import.meta.env.VITE_API_URL}/users/${user.email}`)
-      .then(res => {
-        setUser(prev => ({
+      .then((res) => {
+        setUser((prev) => ({
           ...prev,
-          ...res.data
+          ...res.data,
         }));
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }
 }, [user?.email, setUser]);
 
 
-
-  useEffect(() => {
+useEffect(() => {
     if (user?.displayName) {
       setMeal(prev => ({
         ...prev,
@@ -58,44 +63,49 @@ const CreateMeal = () => {
     }
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!imageFile)
-      return Swal.fire("Error", "Please upload an image", "error");
+  if (!imageFile)
+    return Swal.fire("Error", "Please upload an image", "error");
 
-    const formData = new FormData();
-    formData.append("foodImage", imageFile);
+  const formData = new FormData();
+  formData.append("foodImage", imageFile);
 
-    Object.entries({
-      ...meal,
-      chefId: user?.chefId,
-      userEmail: user?.email,
-    }).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach(v => formData.append(key, v));
-      } else {
-        formData.append(key, value);
-      }
-    });
-
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/meals`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-
-      if (res.data.insertedId) {
-        Swal.fire("Success", "Meal created successfully", "success");
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Failed to create meal", "error");
+  Object.entries({
+    ...meal,
+    chefId: user?.chefId,
+    userEmail: user?.email,
+  }).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((v) => formData.append(key, v));
+    } else {
+      formData.append(key, value);
     }
-  };
+  });
+
+  setLoading(true);
+
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/meals`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    if (res.data.insertedId) {
+      Swal.fire("Success", "Meal created successfully", "success");
+    }
+  } catch (err) {
+    Swal.fire("Error", "Failed to create meal", "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
+if (loading) return <LoadingSpinner />;
 
   return (
     <div className="pt-24 max-w-xl mx-auto p-6 bg-white rounded shadow">

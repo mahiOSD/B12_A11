@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { LoadingContext } from "../../../contexts/LoadingContext";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
 
- 
+  const { loading, setLoading } = useContext(LoadingContext);
+
   const fetchUsers = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/users"); 
+      const res = await axios.get("http://localhost:5000/users");
       setUsers(res.data);
-      setLoading(false);
     } catch (err) {
       console.error(err);
+    } finally {
       setLoading(false);
     }
   };
@@ -22,26 +25,32 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
- 
   const handleMakeFraud = async (userId) => {
+    setLoading(true);
     try {
-      const res = await axios.patch(`http://localhost:5000/users/fraud/${userId}`);
+      const res = await axios.patch(
+        `http://localhost:5000/users/fraud/${userId}`
+      );
+
       Swal.fire({
         icon: "success",
         title: "Success",
         text: res.data.message,
       });
-      fetchUsers(); 
+
+      fetchUsers();
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Error",
         text: err.response?.data?.error || "Something went wrong",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <div className="pt-24 p-6">Loading...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="pt-24 p-6">
@@ -57,13 +66,17 @@ const ManageUsers = () => {
             <th className="border p-2">Action</th>
           </tr>
         </thead>
+
         <tbody>
           {users.map((user) => (
             <tr key={user._id}>
               <td className="border p-2">{user.name}</td>
               <td className="border p-2">{user.email}</td>
               <td className="border p-2">{user.role}</td>
-              <td className="border p-2">{user.status || "active"}</td>
+              <td className="border p-2">
+                {user.status || "active"}
+              </td>
+
               <td className="border p-2">
                 {user.role !== "admin" && user.status !== "fraud" ? (
                   <button
