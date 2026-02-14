@@ -1,134 +1,98 @@
-import { useState, useEffect,useContext } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import useAuth from "../../../hooks/useAuth";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { LoadingContext } from "../../../contexts/LoadingContext";
-import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
-const { loading, setLoading } = useContext(LoadingContext);
-
 
 const CreateMeal = () => {
   const { user, setUser } = useAuth();
-
-  const [meal, setMeal] = useState({
-    foodName: "",
-    price: "",
-    rating: "",
-    ingredients: [],
-    estimatedDeliveryTime: "",
-    chefExperience: "",
-    chefName: user?.displayName || "",
-  });
-
   const [imageFile, setImageFile] = useState(null);
   const [ingredientInput, setIngredientInput] = useState("");
+  const [ingredients, setIngredients] = useState([]);
+
+  const { register, handleSubmit, reset } = useForm();
 
   useEffect(() => {
-  if (user?.email) {
-    setLoading(true);
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/users/${user.email}`)
-      .then((res) => {
-        setUser((prev) => ({
-          ...prev,
-          ...res.data,
-        }));
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }
-}, [user?.email, setUser]);
+    document.title = "Create meal";
+  }, []);
 
-
-useEffect(() => {
-    if (user?.displayName) {
-      setMeal(prev => ({
-        ...prev,
-        chefName: user.displayName,
-      }));
+ 
+  useEffect(() => {
+    if (user?.email) {
+      axios
+        .get(`${import.meta.env.VITE_API_URL}/users/${user.email}`)
+        .then(res => setUser(prev => ({ ...prev, ...res.data })))
+        .catch(err => console.error(err));
     }
-  }, [user]);
-
-  const handleChange = e => {
-    setMeal({ ...meal, [e.target.name]: e.target.value });
-  };
+  }, [user?.email, setUser]);
 
   const handleAddIngredient = () => {
     if (ingredientInput.trim()) {
-      setMeal({
-        ...meal,
-        ingredients: [...meal.ingredients, ingredientInput.trim()],
-      });
+      setIngredients(prev => [...prev, ingredientInput.trim()]);
       setIngredientInput("");
     }
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
+  const onSubmit = async (data) => {
+    if (!imageFile) {
+      return Swal.fire("Error", "Please upload an image", "error");
+    }
 
-  if (!imageFile)
-    return Swal.fire("Error", "Please upload an image", "error");
+    const formData = new FormData();
+    formData.append("foodImage", imageFile);
 
-  const formData = new FormData();
-  formData.append("foodImage", imageFile);
+    
+    ingredients.forEach(ing => formData.append("ingredients", ing));
 
-  Object.entries({
-    ...meal,
-    chefId: user?.chefId,
-    userEmail: user?.email,
-  }).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      value.forEach((v) => formData.append(key, v));
-    } else {
+   
+    const mealData = {
+      ...data,
+      chefName: user?.displayName,
+      chefId: user?.chefId,
+      userEmail: user?.email
+    };
+
+    Object.entries(mealData).forEach(([key, value]) => {
       formData.append(key, value);
-    }
-  });
+    });
 
-  setLoading(true);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/meals`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-  try {
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/meals`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
+      if (res.data.insertedId) {
+        Swal.fire("Success", "Meal created successfully", "success");
+        reset();          
+        setIngredients([]); 
+        setImageFile(null);
       }
-    );
-
-    if (res.data.insertedId) {
-      Swal.fire("Success", "Meal created successfully", "success");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to create meal", "error");
     }
-  } catch (err) {
-    Swal.fire("Error", "Failed to create meal", "error");
-  } finally {
-    setLoading(false);
-  }
-};
-
-if (loading) return <LoadingSpinner />;
+  };
 
   return (
     <div className="pt-24 max-w-xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Create Meal</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
-       
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
         <input
-          name="foodName"
+          {...register("foodName", { required: true })}
           placeholder="Food Name"
-          onChange={handleChange}
           className="w-full p-2 border rounded"
         />
 
-       
         <input
           value={user?.displayName || ""}
           readOnly
           className="w-full p-2 border rounded bg-gray-100"
         />
 
-       
         <input
           type="file"
           accept="image/*"
@@ -136,26 +100,21 @@ if (loading) return <LoadingSpinner />;
           className="w-full p-2 border rounded"
         />
 
-       
         <input
-          name="price"
+          {...register("price", { required: true, min: 1 })}
           type="number"
           placeholder="Price"
-          onChange={handleChange}
           className="w-full p-2 border rounded"
         />
 
-       
         <input
-          name="rating"
+          {...register("rating", { required: true, min: 0, max: 5 })}
           type="number"
           placeholder="Rating"
           step="0.1"
-          onChange={handleChange}
           className="w-full p-2 border rounded"
         />
 
-       
         <div className="flex gap-2">
           <input
             value={ingredientInput}
@@ -172,32 +131,26 @@ if (loading) return <LoadingSpinner />;
           </button>
         </div>
 
-        <p>Ingredients: {meal.ingredients.join(", ")}</p>
+        <p>Ingredients: {ingredients.join(", ")}</p>
 
-      
         <input
-          name="estimatedDeliveryTime"
+          {...register("estimatedDeliveryTime", { required: true })}
           placeholder="Estimated Delivery Time"
-          onChange={handleChange}
           className="w-full p-2 border rounded"
         />
 
-      
         <input
           value={user?.chefId || "Not assigned yet"}
           readOnly
           className="w-full p-2 border rounded bg-gray-100"
         />
 
-        
         <input
-          name="chefExperience"
+          {...register("chefExperience", { required: true })}
           placeholder="Chef Experience"
-          onChange={handleChange}
           className="w-full p-2 border rounded"
         />
 
-       
         <input
           value={user?.email || ""}
           readOnly

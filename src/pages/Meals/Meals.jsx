@@ -9,6 +9,10 @@ const Meals = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+   useEffect(() => {
+    document.title = "Meals – LocalChefBazaar";
+  }, []);
+
  useEffect(() => {
  
   axios.get(`${import.meta.env.VITE_API_URL}/meals`)

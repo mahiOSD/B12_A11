@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 const Home = () => {
   const [meals, setMeals] = useState([]);
   const [reviews, setReviews] = useState([]);
+   useEffect(() => {
+    document.title = "Home – LocalChefBazaar";
+  }, []);
 
   useEffect(() => {
    

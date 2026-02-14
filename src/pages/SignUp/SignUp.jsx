@@ -1,3 +1,4 @@
+import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -10,44 +11,36 @@ const SignUp = () => {
   const location = useLocation();
   const from = location.state || "/";
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const password = watch("password");
 
-    const form = e.target;
-    const name = form.name.value;
-    const email = form.email.value;
-    const image = form.image.value;
-    const address = form.address.value;
-    const password = form.password.value;
-    const confirmPassword = form.confirmPassword.value;
+  const onSubmit = async (data) => {
+    const { name, email, image, address, password, confirmPassword } = data;
 
     if (password !== confirmPassword) {
       return toast.error("Passwords do not match");
     }
 
     try {
-  const result = await createUser(email, password);
+      const result = await createUser(email, password);
+      await updateUserProfile(name, image);
 
-  await updateUserProfile(name, image);
+      const userInfo = {
+        name,
+        email,
+        image,
+        address,
+        role: "user",
+        status: "active",
+      };
 
-  const userInfo = {
-    name,
-    email,
-    image,
-    address,
-    role: "user",
-    status: "active",
-  };
+      await axios.post("http://localhost:5000/users", userInfo);
 
- 
-  await axios.post("http://localhost:5000/users", userInfo);
-
-  toast.success("Signup Successful");
-  navigate(from, { replace: true });
-} catch (err) {
-  toast.error(err.message);
-}
-
+      toast.success("Signup Successful");
+      navigate(from, { replace: true });
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   return (
@@ -55,67 +48,60 @@ const SignUp = () => {
       <div className="max-w-md p-6 bg-gray-100 rounded w-full">
         <h1 className="text-3xl font-bold text-center mb-4">Register</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
           <input
-            name="name"
-            required
+            {...register("name", { required: "Name is required" })}
             placeholder="Full Name"
             className="w-full p-2 border rounded"
           />
+          {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
           <input
-            name="email"
             type="email"
-            required
+            {...register("email", { required: "Email is required" })}
             placeholder="Email"
             className="w-full p-2 border rounded"
           />
+          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
 
           <input
-            name="image"
-            required
+            {...register("image", { required: "Image URL is required" })}
             placeholder="Profile Image URL"
             className="w-full p-2 border rounded"
           />
+          {errors.image && <p className="text-red-500">{errors.image.message}</p>}
 
           <input
-            name="address"
-            required
+            {...register("address", { required: "Address is required" })}
             placeholder="Address"
             className="w-full p-2 border rounded"
           />
+          {errors.address && <p className="text-red-500">{errors.address.message}</p>}
 
           <input
-            name="password"
             type="password"
-            required
+            {...register("password", { required: "Password is required", minLength: { value: 6, message: "Min 6 characters" } })}
             placeholder="Password"
             className="w-full p-2 border rounded"
           />
+          {errors.password && <p className="text-red-500">{errors.password.message}</p>}
 
           <input
-            name="confirmPassword"
             type="password"
-            required
+            {...register("confirmPassword", { required: "Confirm password is required", validate: value => value === password || "Passwords do not match" })}
             placeholder="Confirm Password"
             className="w-full p-2 border rounded"
           />
+          {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
 
           <button className="bg-lime-500 w-full py-2 text-white rounded">
-            {loading ? (
-              <TbFidgetSpinner className="animate-spin m-auto" />
-            ) : (
-              "Register"
-            )}
+            {loading ? <TbFidgetSpinner className="animate-spin m-auto" /> : "Register"}
           </button>
         </form>
 
         <p className="text-sm text-center mt-3">
-          Already have account?{" "}
-          <Link to="/login" className="text-lime-500">
-            Login
-          </Link>
+          Already have account? <Link to="/login" className="text-lime-500">Login</Link>
         </p>
       </div>
     </div>

@@ -1,16 +1,11 @@
 import { Outlet, NavLink } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Navbar from "../components/Shared/Navbar/Navbar";
-import { useContext } from "react";
-import { LoadingContext } from "../contexts/LoadingContext";
-import LoadingSpinner from "../components/Shared/LoadingSpinner";
 
 const DashboardLayout = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { loading } = useContext(LoadingContext);
+  const { user, loading } = useAuth();
 
-  if (authLoading || loading) return <LoadingSpinner />;
-
+  if (loading) return <div className="pt-24 text-center">Loading...</div>;
   if (!user) return null;
 
   return (
@@ -19,7 +14,6 @@ const DashboardLayout = () => {
 
       <div className="pt-24 flex">
         <div className="w-64 bg-gray-100 min-h-screen p-4">
-
           <h2 className="text-xl font-bold mb-6">
             {user.role?.toUpperCase()} Dashboard
           </h2>

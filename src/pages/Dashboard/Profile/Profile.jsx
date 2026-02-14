@@ -7,6 +7,10 @@ const Profile = () => {
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
+    document.title = "Profile";
+  }, []);
+
+  useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/users/${user.email}`)
       .then(res => setUserInfo(res.data))
       .catch(err => console.error(err));

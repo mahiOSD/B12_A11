@@ -1,4 +1,10 @@
+import { useEffect } from "react";
+
 const AdminDashboard = () => {
+
+  useEffect(() => {
+    document.title = "Admin";
+  }, []);
   return (
     <div className="pt-32 px-6 max-w-5xl mx-auto text-center">
       <h1 className="text-4xl font-bold mb-4">Welcome, Admin!</h1>

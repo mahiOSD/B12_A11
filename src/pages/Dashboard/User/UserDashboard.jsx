@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 const UserDashboard = () => {
+  useEffect(() => {
+    document.title = "User-home";
+  }, []);
   return (
     <div className="pt-24 flex justify-center items-center min-h-[70vh]">
       <div className="text-center max-w-xl">
